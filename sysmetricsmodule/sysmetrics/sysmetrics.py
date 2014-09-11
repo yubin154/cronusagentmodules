@@ -36,11 +36,15 @@ class SysMetricsController(ModuleBaseController):
         return 'Inside SysMetricsController index ' + os.getcwd()
 
     def getSysMetrics(self):
-        result = SysMetricsController.collectMetrics()
+        diskstr = request.params.get('disks', None)
+        disks = diskstr.split(',') if diskstr else []
+        ifcstr = request.params.get('ifcs', None)
+        ifcs = ifcstr.split(',') if ifcstr else ['eth0']
+        result = SysMetricsController.collectMetrics(disks, ifcs)
         return doneResult(request, response, result = result, controller = self)
     
     @staticmethod
-    def collectMetrics():
+    def collectMetrics(disks, ifcs):
         """ collect metrics """
         result = {}
         # cpu
@@ -59,11 +63,11 @@ class SysMetricsController(ModuleBaseController):
             result['cpu.load_avg_pct.%s' % itm] = '%s' % cpuLoadAvgs[_]
     
         # disk
-        disk_1 = 'sda1'
-        result['disk.busy'] =  '%s' % lm.disk_stat.disk_busy('sda', sample_duration=1)
-        r, w = lm.disk_stat.disk_reads_writes(disk_1)    
-        result['disk.reads'] = '%s' % r
-        result['disk.writes'] = '%s' % w
+        for disk in disks:
+            result['disk.busy.%s' % disk] =  '%s' % lm.disk_stat.disk_busy(disk, sample_duration=1)
+            r, w = lm.disk_stat.disk_reads_writes(disk)    
+            result['disk.reads.%s' % disk] = '%s' % r
+            result['disk.writes.%s' % disk] = '%s' % w
         result['disk.used_pct.root'] = '%s' % lm.disk_stat.disk_usage('/')[4]
         result['disk.used_pct.var'] = '%s' % lm.disk_stat.disk_usage('/var')[4]
     
@@ -73,10 +77,10 @@ class SysMetricsController(ModuleBaseController):
         result['mem.total'] = '%s' % total
 
         # network
-        ifc_1 = 'eth0'
-        rx_bytes, tx_bytes = lm.net_stat.rx_tx_bytes(ifc_1)   
-        result['net.bytes_received'] = '%s' % rx_bytes
-        result['net.bytes_sent'] = '%s' % tx_bytes 
+        for ifc in ifcs:
+            rx_bytes, tx_bytes = lm.net_stat.rx_tx_bytes(ifc)   
+            result['net.bytes_received.%s' % ifc] = '%s' % rx_bytes
+            result['net.bytes_sent.%s' % ifc] = '%s' % tx_bytes 
         return result
         
     
