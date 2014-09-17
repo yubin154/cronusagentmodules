@@ -1,0 +1,11 @@
+#!/bin/bash -ae
+# this script activate an application
+
+
+abspath=$(cd ${0%/*} && echo $PWD/${0##*/})
+scripts_dir=`dirname "$abspath"`
+echo "script_dir=$scripts_dir"
+package_root=$script_dir/../..
+echo "package_root=$package_root"
+
+exit 0

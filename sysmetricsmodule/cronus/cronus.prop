@@ -1,8 +1,7 @@
 {
-"name":"[[[name]]]",
+"name":"[[[]]]",
 "md5":"[[[md5]]]",
-"description":"discover os information",
-"long description":"discover os information",
+"description":"system metrics module",
 "size":[[[size]]],
-"contact":"you@ebay.com"
+"contact":"cronus@stackscaling.com"
 }
